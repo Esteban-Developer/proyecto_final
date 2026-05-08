@@ -25,11 +25,13 @@ from .utils import (
     set_flash,
 )
 from .api_products import router as productos_router
+from .observability import setup_logging, new_request_id, request_id_from_request, log_api
 from .order_status import get_order_status, set_order_status
 from .queue import enqueue_order_request, QueueConnectionError
 
 
 settings = get_settings()
+setup_logging()
 
 app = FastAPI(title="Inferno Colombia - FastAPI")
 app.add_middleware(SessionMiddleware, secret_key=settings.app_secret_key)
@@ -54,6 +56,16 @@ def _mount_static() -> None:
 
 _mount_static()
 app.include_router(productos_router)
+
+
+@app.middleware("http")
+async def request_id_middleware(request: Request, call_next):
+    incoming_request_id = request.headers.get("x-request-id")
+    request.state.request_id = incoming_request_id.strip() if incoming_request_id else new_request_id()
+    log_api(request, f"Request {request.method} {request.url.path}")
+    response = await call_next(request)
+    response.headers["x-request-id"] = request.state.request_id
+    return response
 
 
 def _redirect(url: str) -> RedirectResponse:
@@ -276,7 +288,7 @@ def checkout(
     customer_email = ctx["session_customer_email"]
 
     if not is_logged_in(customer_email):
-        set_flash(request, "Inicia sesi?n para finalizar compra.")
+        set_flash(request, "Inicia sesion para finalizar compra.")
         return _redirect("/login")
 
     customer = db.query(Customer).filter(Customer.customer_email == customer_email).first()
@@ -288,20 +300,24 @@ def checkout(
     items = db.query(CartItem).filter(CartItem.c_id == customer_email).all()
     if place is not None:
         if not items:
-            set_flash(request, "No hay art?culos en el carrito.")
+            set_flash(request, "No hay articulos en el carrito.")
             return _redirect("/cart")
 
+        current_request_id = request_id_from_request(request)
         payload = {
             "customer_email": customer_email,
             "customer_id": int(customer.customer_id),
         }
         try:
-            created_request_id = enqueue_order_request(payload)
+            log_api(request, "Evento de checkout enviado a RabbitMQ")
+            created_request_id = enqueue_order_request(payload, request_id=current_request_id)
         except QueueConnectionError:
+            log_api(request, "RabbitMQ no disponible al intentar enviar checkout")
             set_flash(request, "RabbitMQ no disponible. Intenta nuevamente en unos segundos.")
             return _redirect("/checkout")
 
         set_order_status(created_request_id, "PENDING")
+        log_api(request, f"Estado en Redis actualizado a PENDING ({created_request_id})")
         return _redirect(f"/checkout?request_id={created_request_id}")
 
     product_ids = [i.products_id for i in items]
@@ -335,8 +351,9 @@ def checkout(
 
 
 @app.get("/checkout/status/{request_id}")
-def checkout_status(request_id: str) -> JSONResponse:
+def checkout_status(request_id: str, request: Request) -> JSONResponse:
     status = get_order_status(request_id) or "NOT_FOUND"
+    log_api(request, f"Consulta de estado checkout => {request_id} = {status}")
     return JSONResponse({"request_id": request_id, "status": status})
 
 

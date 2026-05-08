@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from .db import SessionLocal
 from .models import CartItem, Order, Product
+from .observability import setup_logging, log_worker
 from .order_status import set_order_status
 from .queue import consume_order_requests
 
@@ -26,12 +27,14 @@ def _process_order_message(ch, method, properties, body: bytes) -> None:
     try:
         payload = json.loads(body.decode("utf-8"))
         request_id = str(payload["request_id"])
+        log_worker(request_id, "Evento recibido desde RabbitMQ")
         customer_email = str(payload["customer_email"])
         customer_id = int(payload["customer_id"])
 
         items = db.query(CartItem).filter(CartItem.c_id == customer_email).all()
         if not items:
             set_order_status(request_id, "FAILED")
+            log_worker(request_id, "Sin items en carrito, estado FAILED")
             ch.basic_ack(delivery_tag=method.delivery_tag)
             return
 
@@ -49,23 +52,27 @@ def _process_order_message(ch, method, properties, body: bytes) -> None:
         db.add(order)
         db.query(CartItem).filter(CartItem.c_id == customer_email).delete()
         db.commit()
+        log_worker(request_id, "Orden persistida en MySQL y carrito limpiado")
 
         delay_seconds = _get_processing_delay_seconds()
         if delay_seconds > 0:
-            print(f"[worker] Simulando demora de {delay_seconds}s para request_id={request_id}")
+            log_worker(request_id, f"Simulando demora de {delay_seconds}s")
             time.sleep(delay_seconds)
 
         set_order_status(request_id, "CONFIRMED")
+        log_worker(request_id, "Estado en Redis actualizado a CONFIRMED")
         ch.basic_ack(delivery_tag=method.delivery_tag)
-    except Exception:  # noqa: BLE001
+    except Exception as exc:  # noqa: BLE001
         db.rollback()
         set_order_status(request_id, "FAILED")
+        log_worker(request_id, f"Error procesando evento: {exc}")
         ch.basic_ack(delivery_tag=method.delivery_tag)
     finally:
         db.close()
 
 
 def run_worker() -> None:
+    setup_logging()
     consume_order_requests(_process_order_message)
 
 

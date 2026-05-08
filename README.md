@@ -1,7 +1,7 @@
-﻿#  Inferno Colombia — E-commerce Distribuido (Corte 2)
+﻿# Inferno Colombia — E-commerce Distribuido (Corte 3)
 
 <p align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&height=220&color=0:0f172a,50:1e293b,100:334155&text=Inferno%20Colombia%20Corte%202&fontColor=ffffff&fontSize=42&animation=fadeIn&fontAlignY=38&desc=FastAPI%20%2B%20Redis%20%2B%20RabbitMQ%20%2B%20MySQL&descAlignY=58" alt="Inferno Colombia Banner" />
+  <img src="https://capsule-render.vercel.app/api?type=waving&height=220&color=0:0f172a,50:1e293b,100:334155&text=Inferno%20Colombia%20Corte%203&fontColor=ffffff&fontSize=42&animation=fadeIn&fontAlignY=38&desc=FastAPI%20%2B%20Redis%20%2B%20RabbitMQ%20%2B%20MySQL&descAlignY=58" alt="Inferno Colombia Banner" />
 </p>
 
 <p align="center">
@@ -29,14 +29,17 @@
 
 ---
 
-##  ¿Qué incluye este corte?
+## ¿Qué incluye este corte?
 
--  Front web e-commerce (Jinja2 + assets del proyecto original)
--  API REST de catálogo (`/productos`)
--  Checkout asíncrono real
--  RabbitMQ para mensajería/cola de pedidos
--  Redis como coordinador de estado de pedidos
--  Worker en Python para procesamiento en segundo plano
+- Front web e-commerce (Jinja2 + assets del proyecto original)
+- API REST de catálogo (`/productos`)
+- Checkout asíncrono real
+- RabbitMQ para mensajería/cola de pedidos
+- Redis como coordinador de estado de pedidos
+- Worker en Python para procesamiento en segundo plano
+- Observabilidad (logs por servicio + `request_id`)
+- `Makefile` para demo final (`make start`)
+- Pipeline CI con GitHub Actions
 
 ---
 
@@ -51,7 +54,7 @@
 
 ---
 
-##  Componentes del sistema
+## Componentes del sistema
 
 | Componente | Rol |
 |---|---|
@@ -60,7 +63,9 @@
 | `fastapi_app/app/queue.py` | Publicar/consumir mensajes en RabbitMQ |
 | `fastapi_app/app/worker.py` | Procesamiento asíncrono de pedidos |
 | `fastapi_app/app/order_status.py` | Lectura/escritura del estado en Redis |
-| `fastapi_app/docker-compose.yml` | Levanta Redis y RabbitMQ |
+| `fastapi_app/docker-compose.yml` | Levanta API, Worker, Redis y RabbitMQ |
+| `Makefile` | Comandos de operación (`start`, `stop`, `logs`, etc.) |
+| `.github/workflows/ci.yml` | Build y validación automática en cada push/PR |
 
 ---
 
@@ -82,7 +87,7 @@ Cliente consulta /checkout/status/{request_id}
 
 ---
 
-##  Endpoints principales
+## Endpoints principales
 
 <details>
 <summary><b>Web</b></summary>
@@ -109,14 +114,14 @@ Swagger: `http://127.0.0.1:8000/docs`
 
 ---
 
-##  Instalación y ejecución
+## Instalación y ejecución
 
 > Ejecuta todo desde `fastapi_app/`
 
 ### 1) Preparar entorno
 
 ```powershell
-cd "C:\xampp\htdocs\Ecommerce-infernocol corte 2\fastapi_app"
+cd "C:\xampp\htdocs\Ecommerce-infernocol corte 3\fastapi_app"
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
@@ -159,7 +164,7 @@ Terminal B:
 
 ---
 
-##  Demo rápida
+## Demo rápida
 
 1. Inicia sesión.
 2. Agrega producto al carrito.
@@ -170,7 +175,7 @@ Terminal B:
 
 ---
 
-##  Troubleshooting
+## Troubleshooting
 
 - **`No module named 'app'`**: ejecuta comandos dentro de `fastapi_app/`.
 - **`No module named 'redis'`**: usa `python -m pip install -r requirements.txt` con Python del `.venv`.
@@ -178,7 +183,37 @@ Terminal B:
 
 ---
 
-##  Autores
+## Demo final (Makefile)
+
+Desde la raíz del proyecto:
+
+```bash
+make start
+```
+
+Otros comandos:
+
+```bash
+make logs
+make api
+make worker
+make stop
+```
+
+---
+
+## CI/CD (GitHub Actions)
+
+Pipeline en `.github/workflows/ci.yml`:
+- instala dependencias de `fastapi_app`
+- valida sintaxis (`compileall`)
+- construye imagen Docker de la API
+
+Se ejecuta automáticamente en push/pull request a `main`.
+
+---
+
+## Autores
 
 - **Esteban Murillo Gomez**
 - **Miguel Angel Villamil Echavarria**

@@ -2,34 +2,35 @@
 
 Este directorio contiene la migración del ecommerce PHP a **Python + FastAPI**, reutilizando assets (`/css`, `/js`, `/img`, `/fonts`) y MySQL `threaderz_store`.
 
-Ahora incluye **checkout asíncrono** con:
-- **RabbitMQ**: encola solicitudes de pedido.
-- **Redis**: guarda estado de procesamiento (`PENDING`, `CONFIRMED`, `FAILED`).
+Incluye checkout asíncrono con:
+- **RabbitMQ** para encolar eventos de pedido
+- **Redis** para estado temporal (`PENDING`, `CONFIRMED`, `FAILED`)
+- **Worker** para procesamiento en background
+- **Observabilidad básica** con logs por servicio y `request_id`
 
 ## Requisitos
 
 - Python 3.10+
 - MySQL (XAMPP)
-- Docker Desktop (para Redis + RabbitMQ)
+- Docker Desktop
 - Base de datos importada desde `store.sql`
 
 ## Configuración
 
 1. Copia `.env.example` a `.env`.
-2. Ajusta credenciales de MySQL y, si cambias puertos/hosts, también Redis y RabbitMQ.
+2. Ajusta credenciales de MySQL.
+3. Si quieres demo visible de estado `PENDING`, usa `ORDER_PROCESSING_DELAY_SECONDS=40`.
 
-## Instalación
+## Instalación local
 
 ```bash
-recordar activar el xampp
-primero deactivate el entorno que se ejecuta por defecto
 cd fastapi_app
 python -m venv .venv
 .venv\Scripts\activate
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 
-## Levantar Redis + RabbitMQ (Docker)
+## Levantar infraestructura (Redis + RabbitMQ)
 
 ```bash
 cd fastapi_app
@@ -37,52 +38,64 @@ docker compose up -d
 ```
 
 - RabbitMQ Management: http://localhost:15672
-- Usuario/clave por defecto: `guest` / `guest`
+- Usuario/clave: `guest` / `guest`
 
-## Ejecutar API y Worker
+## Ejecutar API y Worker (modo local)
 
-En una terminal:
+Terminal A:
 
 ```bash
 cd fastapi_app
-uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
-En otra terminal:
+Terminal B:
 
 ```bash
-primero deactivate el entorno que se ejecuta por defecto
 cd fastapi_app
 python -m app.worker
 ```
 
+## Ejecutar todo con Docker Compose
+
+```bash
+cd fastapi_app
+docker compose up --build
+```
+
+Servicios incluidos:
+- `api`
+- `worker`
+- `redis`
+- `rabbitmq`
+
 ## Flujo de checkout asíncrono
 
-1. Usuario hace clic en `Realizar Pedido` (`/checkout?place=1`).
-2. API publica mensaje en RabbitMQ (cola `orders.create`) y guarda estado `PENDING` en Redis.
-3. API redirige a `/checkout?request_id=<uuid>`.
-4. Front consulta `/checkout/status/{request_id}` periódicamente.
-5. Worker consume mensaje, crea orden en MySQL, limpia carrito y marca `CONFIRMED` (o `FAILED`) en Redis.
+1. Usuario confirma pedido en `/checkout?place=1`.
+2. API genera/propaga `request_id`.
+3. API envía evento a RabbitMQ (`orders.create`).
+4. API marca estado `PENDING` en Redis.
+5. Worker consume evento, crea orden en MySQL y limpia carrito.
+6. Worker actualiza estado a `CONFIRMED` o `FAILED`.
+7. Cliente consulta `GET /checkout/status/{request_id}`.
 
-## Endpoints nuevos
+## Observabilidad implementada
 
-- `GET /checkout/status/{request_id}`: devuelve estado JSON del pedido asíncrono.
+- Logs por servicio:
+  - `[API][request_id] ...`
+  - `[WORKER][request_id] ...`
+- `request_id` viaja entre API -> RabbitMQ -> Worker -> Redis
+- Header de respuesta: `x-request-id`
 
-## Rutas principales
+## Endpoints clave
 
-- `/` Inicio
-- `/shop` Tienda
-- `/product/{product_id}` Detalle
-- `/cart` Carrito
-- `/checkout` Checkout
-- `/login`, `/register`, `/logout`
-- `/account?orders=1` y `/account?details=1`
-- `/contact`
-- `/admin/insert-product`
-- `/productos`, `/productos/{id}` API catálogo
+- `GET /checkout/status/{request_id}`
+- `POST /productos`
+- `GET /productos`
+- `GET /productos/{id}`
 
 ## Notas
 
 - Autenticación por cookie de sesión (`customer_email`).
 - Contraseñas siguen como en el proyecto original (texto plano en DB).
-- Si RabbitMQ o Redis no están disponibles, el checkout asíncrono no podrá completarse.
+- Si RabbitMQ o Redis caen, checkout asíncrono reporta error controlado en API.
