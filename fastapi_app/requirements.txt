@@ -1,4 +1,4 @@
-﻿fastapi
+fastapi
 uvicorn[standard]
 jinja2
 sqlalchemy
@@ -7,3 +7,4 @@ python-multipart
 python-dotenv
 redis
 pika
+itsdangerous

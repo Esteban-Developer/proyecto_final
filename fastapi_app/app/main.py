@@ -93,7 +93,7 @@ def home(request: Request, db: Session = Depends(get_db)) -> Any:
     )
 
     ctx.update({"slides": slides, "women_products": women_products, "men_products": men_products})
-    return templates.TemplateResponse("index.html", ctx)
+    return templates.TemplateResponse(request, "index.html", ctx)
 
 
 @app.post("/search")
@@ -158,7 +158,7 @@ def shop(
             "filter_desc": desc,
         }
     )
-    return templates.TemplateResponse("shop.html", ctx)
+    return templates.TemplateResponse(request, "shop.html", ctx)
 
 
 @app.get("/product/{product_id}", response_class=HTMLResponse)
@@ -180,7 +180,7 @@ def product_detail(request: Request, product_id: int, db: Session = Depends(get_
     )
 
     ctx.update({"product": product, "pcat": pcat, "related_products": related})
-    return templates.TemplateResponse("product.html", ctx)
+    return templates.TemplateResponse(request, "product.html", ctx)
 
 
 @app.post("/cart/add")
@@ -262,7 +262,7 @@ def cart_view(request: Request, db: Session = Depends(get_db)) -> Any:
         )
 
     ctx.update({"cart_rows": cart_rows, "subtotal": subtotal, "total": subtotal})
-    return templates.TemplateResponse("cart.html", ctx)
+    return templates.TemplateResponse(request, "cart.html", ctx)
 
 
 @app.get("/cart/remove/{product_id}")
@@ -347,7 +347,7 @@ def checkout(
             "checkout_status": checkout_status,
         }
     )
-    return templates.TemplateResponse("checkout.html", ctx)
+    return templates.TemplateResponse(request, "checkout.html", ctx)
 
 
 @app.get("/checkout/status/{request_id}")
@@ -360,7 +360,7 @@ def checkout_status(request_id: str, request: Request) -> JSONResponse:
 @app.get("/login", response_class=HTMLResponse)
 def login_form(request: Request, db: Session = Depends(get_db)) -> Any:
     ctx = build_base_context(request, db, active="Iniciar Sesión")
-    return templates.TemplateResponse("login.html", ctx)
+    return templates.TemplateResponse(request, "login.html", ctx)
 
 
 @app.post("/login")
@@ -399,7 +399,7 @@ def logout(request: Request) -> Any:
 @app.get("/register", response_class=HTMLResponse)
 def register_form(request: Request, db: Session = Depends(get_db)) -> Any:
     ctx = build_base_context(request, db, active="Registro")
-    return templates.TemplateResponse("register.html", ctx)
+    return templates.TemplateResponse(request, "register.html", ctx)
 
 
 @app.post("/register")
@@ -472,13 +472,13 @@ def account(request: Request, db: Session = Depends(get_db), orders: int | None 
         )
 
     ctx.update({"show_orders": orders is not None, "show_details": details is not None, "orders_list": orders_list})
-    return templates.TemplateResponse("account.html", ctx)
+    return templates.TemplateResponse(request, "account.html", ctx)
 
 
 @app.get("/contact", response_class=HTMLResponse)
 def contact_form(request: Request, db: Session = Depends(get_db)) -> Any:
     ctx = build_base_context(request, db, active="Contacto")
-    return templates.TemplateResponse("contact.html", ctx)
+    return templates.TemplateResponse(request, "contact.html", ctx)
 
 
 @app.post("/contact")
@@ -522,7 +522,7 @@ def admin_insert_product_form(request: Request, db: Session = Depends(get_db)) -
             "all_product_categories": db.query(ProductCategory).order_by(ProductCategory.p_cat_id.asc()).all(),
         }
     )
-    return templates.TemplateResponse("admin_insert_product.html", ctx)
+    return templates.TemplateResponse(request, "admin_insert_product.html", ctx)
 
 
 @app.post("/admin/insert-product")

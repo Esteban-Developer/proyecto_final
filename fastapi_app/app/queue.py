@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import json
 import uuid
@@ -27,8 +27,8 @@ def _connection_params() -> pika.ConnectionParameters:
     )
 
 
-def enqueue_order_request(payload: dict) -> str:
-    request_id = str(uuid.uuid4())
+def enqueue_order_request(payload: dict, request_id: str | None = None) -> str:
+    request_id = request_id or str(uuid.uuid4())
     body = {"request_id": request_id, **payload}
 
     try:

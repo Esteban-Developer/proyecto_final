@@ -1,4 +1,4 @@
-﻿services:
+services:
   api:
     build:
       context: ..
@@ -11,12 +11,13 @@
     environment:
       REDIS_HOST: redis
       RABBITMQ_HOST: rabbitmq
-      DB_HOST: host.docker.internal
+      DB_HOST: mysql
     ports:
       - "8000:8000"
     depends_on:
       - redis
       - rabbitmq
+      - mysql
 
   worker:
     build:
@@ -30,10 +31,11 @@
     environment:
       REDIS_HOST: redis
       RABBITMQ_HOST: rabbitmq
-      DB_HOST: host.docker.internal
+      DB_HOST: mysql
     depends_on:
       - redis
       - rabbitmq
+      - mysql
 
   redis:
     image: redis:7-alpine
@@ -50,3 +52,16 @@
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
+
+  mysql:
+    image: mysql:8.0
+    container_name: inferno_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ""
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: threaderz_store
+    ports:
+      - "3306:3306"
+    volumes:
+      - ../store.sql:/docker-entrypoint-initdb.d/init.sql

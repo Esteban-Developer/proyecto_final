@@ -1,4 +1,4 @@
-﻿# FastAPI migration (Inferno Colombia)
+# FastAPI migration (Inferno Colombia)
 
 Este directorio contiene la migración del ecommerce PHP a **Python + FastAPI**, reutilizando assets (`/css`, `/js`, `/img`, `/fonts`) y MySQL `threaderz_store`.
 
@@ -8,66 +8,37 @@ Incluye checkout asíncrono con:
 - **Worker** para procesamiento en background
 - **Observabilidad básica** con logs por servicio y `request_id`
 
-## Requisitos
+## 🚀 Manual de Ejecución (¡100% Dockerizado!)
 
-- Python 3.10+
-- MySQL (XAMPP)
-- Docker Desktop
-- Base de datos importada desde `store.sql`
+> **¡IMPORTANTE!** Ya no necesitas instalar Python ni usar XAMPP. Todo el sistema corre dentro de contenedores (API, Worker, Redis, RabbitMQ y MySQL).
 
-## Configuración
+### Opción 1: Usuarios de Windows (PowerShell / CMD)
 
-1. Copia `.env.example` a `.env`.
-2. Ajusta credenciales de MySQL.
-3. Si quieres demo visible de estado `PENDING`, usa `ORDER_PROCESSING_DELAY_SECONDS=40`.
+Si no tienes `make` instalado, abre tu terminal en la carpeta principal del proyecto (la raíz, fuera de `fastapi_app`) y ejecuta:
 
-## Instalación local
-
-```bash
-cd fastapi_app
-python -m venv .venv
-.venv\Scripts\activate
-python -m pip install -r requirements.txt
+```powershell
+docker compose -f fastapi_app/docker-compose.yml up -d --build
 ```
 
-## Levantar infraestructura (Redis + RabbitMQ)
-
-```bash
-cd fastapi_app
-docker compose up -d
+Para ver los logs en vivo (ideal para ver el proceso de compra):
+```powershell
+docker compose -f fastapi_app/docker-compose.yml logs -f
 ```
 
-- RabbitMQ Management: http://localhost:15672
-- Usuario/clave: `guest` / `guest`
-
-## Ejecutar API y Worker (modo local)
-
-Terminal A:
-
-```bash
-cd fastapi_app
-python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+Para apagar el sistema:
+```powershell
+docker compose -f fastapi_app/docker-compose.yml down
 ```
 
-Terminal B:
+### Opción 2: Usuarios con `make` (Linux / Mac / Windows con Make)
+
+Desde la carpeta principal del proyecto (la raíz):
 
 ```bash
-cd fastapi_app
-python -m app.worker
+make start     # Levanta todos los servicios
+make logs      # Muestra los logs en vivo
+make stop      # Detiene el sistema
 ```
-
-## Ejecutar todo con Docker Compose
-
-```bash
-cd fastapi_app
-docker compose up --build
-```
-
-Servicios incluidos:
-- `api`
-- `worker`
-- `redis`
-- `rabbitmq`
 
 ## Flujo de checkout asíncrono
 

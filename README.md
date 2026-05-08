@@ -1,4 +1,4 @@
-﻿# Inferno Colombia — E-commerce Distribuido (Corte 3)
+# Inferno Colombia — E-commerce Distribuido (Corte 3)
 
 <p align="center">
   <img src="https://capsule-render.vercel.app/api?type=waving&height=220&color=0:0f172a,50:1e293b,100:334155&text=Inferno%20Colombia%20Corte%203&fontColor=ffffff&fontSize=42&animation=fadeIn&fontAlignY=38&desc=FastAPI%20%2B%20Redis%20%2B%20RabbitMQ%20%2B%20MySQL&descAlignY=58" alt="Inferno Colombia Banner" />
@@ -114,52 +114,36 @@ Swagger: `http://127.0.0.1:8000/docs`
 
 ---
 
-## Instalación y ejecución
+##  Manual de Ejecución (¡100% Dockerizado!)
 
-> Ejecuta todo desde `fastapi_app/`
+> **¡NUEVO!** El proyecto ya no depende de XAMPP local. La base de datos MySQL se inicializa automáticamente en Docker usando el archivo `store.sql`.
 
-### 1) Preparar entorno
+### Opción 1: Usuarios de Windows (PowerShell / CMD)
+
+Si no tienes instalada la herramienta `make`, puedes levantar todo el sistema directamente con Docker Compose desde la **raíz del proyecto**:
 
 ```powershell
-cd "C:\xampp\htdocs\Ecommerce-infernocol corte 3\fastapi_app"
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install -r requirements.txt
+docker compose -f fastapi_app/docker-compose.yml up -d --build
 ```
 
-### 2) Configurar variables
-
+Para ver los logs en vivo (vital para la sustentación):
 ```powershell
-copy .env.example .env
+docker compose -f fastapi_app/docker-compose.yml logs -f
 ```
 
-Ajusta en `.env`:
-
-- `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`
-- `REDIS_HOST`, `REDIS_PORT`
-- `RABBITMQ_HOST`, `RABBITMQ_PORT`
-- (Opcional demo visual) `ORDER_PROCESSING_DELAY_SECONDS=40`
-
-### 3) Levantar Redis + RabbitMQ
-
+Para detener y borrar el sistema:
 ```powershell
-docker compose up -d
+docker compose -f fastapi_app/docker-compose.yml down
 ```
 
-RabbitMQ Panel: `http://localhost:15672` (`guest/guest`)
+### Opción 2: Usuarios con `make` (Linux / Mac / Windows con Make)
 
-### 4) Ejecutar API y Worker
+Desde la raíz del proyecto, usa el Makefile:
 
-Terminal A:
-
-```powershell
-.\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
-```
-
-Terminal B:
-
-```powershell
-.\.venv\Scripts\python.exe -m app.worker
+```bash
+make start     # Levanta todos los servicios
+make logs      # Muestra los logs en vivo
+make stop      # Detiene el sistema
 ```
 
 ---
@@ -183,24 +167,7 @@ Terminal B:
 
 ---
 
-## Demo final (Makefile)
 
-Desde la raíz del proyecto:
-
-```bash
-make start
-```
-
-Otros comandos:
-
-```bash
-make logs
-make api
-make worker
-make stop
-```
-
----
 
 ## CI/CD (GitHub Actions)
 
