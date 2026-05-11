@@ -41,6 +41,8 @@ def enqueue_order_request(payload: dict, request_id: str | None = None) -> str:
             body=json.dumps(body).encode("utf-8"),
             properties=pika.BasicProperties(delivery_mode=2),
         )
+        from .observability import log_rabbitmq
+        log_rabbitmq(request_id, "mensaje enviado")
         conn.close()
     except Exception as exc:  # noqa: BLE001
         raise QueueConnectionError(str(exc)) from exc

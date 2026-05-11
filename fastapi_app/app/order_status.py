@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import redis
 
@@ -22,6 +22,8 @@ def set_order_status(request_id: str, status: str, ttl_seconds: int = 3600) -> N
     key = f"order_status:{request_id}"
     client = _redis_client()
     client.setex(key, ttl_seconds, status)
+    from .observability import log_redis
+    log_redis(request_id, "lock creado" if status == "PENDING" else f"estado actualizado a {status}")
 
 
 def get_order_status(request_id: str) -> str | None:

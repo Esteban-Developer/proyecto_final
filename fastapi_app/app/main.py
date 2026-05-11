@@ -309,6 +309,7 @@ def checkout(
             "customer_id": int(customer.customer_id),
         }
         try:
+            log_api(request, "Orden creada")
             log_api(request, "Evento de checkout enviado a RabbitMQ")
             created_request_id = enqueue_order_request(payload, request_id=current_request_id)
         except QueueConnectionError:

@@ -32,3 +32,11 @@ def log_api(request: Request, message: str) -> None:
 def log_worker(request_id: str, message: str) -> None:
     logging.info("[WORKER][%s] %s", request_id, message)
 
+
+def log_rabbitmq(request_id: str, message: str) -> None:
+    logging.info("[RABBITMQ][%s] %s", request_id, message)
+
+
+def log_redis(request_id: str, message: str) -> None:
+    logging.info("[REDIS][%s] %s", request_id, message)
+

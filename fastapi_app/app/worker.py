@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import json
 import os
@@ -61,6 +61,7 @@ def _process_order_message(ch, method, properties, body: bytes) -> None:
 
         set_order_status(request_id, "CONFIRMED")
         log_worker(request_id, "Estado en Redis actualizado a CONFIRMED")
+        log_worker(request_id, "Evento procesado")
         ch.basic_ack(delivery_tag=method.delivery_tag)
     except Exception as exc:  # noqa: BLE001
         db.rollback()
