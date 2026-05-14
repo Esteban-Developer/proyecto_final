@@ -118,7 +118,12 @@ Swagger: `http://127.0.0.1:8000/docs`
 
 > **¡NUEVO!** El proyecto ya no depende de XAMPP local. La base de datos MySQL se inicializa automáticamente en Docker usando el archivo `store.sql`.
 
-### Opción 1: Usuarios de Windows (PowerShell / CMD)
+### clonar repo
+git clonehttps://github.com/Esteban-Developer/proyecto_final.git
+
+tener abierto docker
+
+###  Usuarios de Windows (PowerShell / CMD)
 
 Si no tienes instalada la herramienta `make`, puedes levantar todo el sistema directamente con Docker Compose desde la **raíz del proyecto**:
 
