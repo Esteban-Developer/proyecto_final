@@ -83,3 +83,16 @@ services:
       - "8081:8081"
     depends_on:
       - redis
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: inferno_portainer
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    restart: always
+
+volumes:
+  portainer_data:

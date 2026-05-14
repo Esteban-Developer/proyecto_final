@@ -2,13 +2,13 @@ SHELL := /bin/bash
 
 COMPOSE_FILE := fastapi_app/docker-compose.yml
 
-.PHONY: help start stop restart logs rebuild ps api worker
+.PHONY: help start up stop down restart logs rebuild ps api worker
 
 help:
 	@echo "Comandos disponibles:"
-	@echo "  make start   -> levanta API + Worker + Redis + RabbitMQ"
-	@echo "  make stop    -> detiene contenedores"
-	@echo "  make restart -> reinicia el stack"
+	@echo "  make start / up   -> levanta API + Worker + Redis + RabbitMQ + Portainer"
+	@echo "  make stop / down  -> detiene contenedores"
+	@echo "  make restart      -> reinicia el stack"
 	@echo "  make logs    -> muestra logs de todos los servicios"
 	@echo "  make rebuild -> reconstruye imágenes y levanta"
 	@echo "  make ps      -> estado de contenedores"
@@ -18,8 +18,12 @@ help:
 start:
 	docker compose -f $(COMPOSE_FILE) up -d
 
+up: start
+
 stop:
 	docker compose -f $(COMPOSE_FILE) down
+
+down: stop
 
 restart: stop start
 
