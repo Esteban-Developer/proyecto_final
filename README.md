@@ -119,7 +119,7 @@ Swagger: `http://127.0.0.1:8000/docs`
 > **¡NUEVO!** El proyecto ya no depende de XAMPP local. La base de datos MySQL se inicializa automáticamente en Docker usando el archivo `store.sql`.
 
 ### clonar repo
-git clonehttps://github.com/Esteban-Developer/proyecto_final.git
+git clone https://github.com/Esteban-Developer/proyecto_final.git
 
 tener abierto docker
 
