@@ -114,23 +114,23 @@ Swagger: `http://127.0.0.1:8000/docs`
 
 ---
 
-##  Manual de Ejecución (¡100% Dockerizado!)
+##  Manual de Ejecución (¡100% Dockerizado y Distribuido!)
 
-> **¡NUEVO!** El proyecto ya no depende de XAMPP local. La base de datos MySQL se inicializa automáticamente en Docker usando el archivo `store.sql`.
+> **¡NUEVO!** El proyecto ya no depende de XAMPP local. La base de datos MySQL se inicializa automáticamente en Docker usando el archivo `store.sql`. **Además, las imágenes del sistema se descargan automáticamente desde DockerHub gracias a nuestro pipeline de CI/CD.**
 
-### clonar repo
+### Clonar repositorio
 
-abrir la consola de comandos y ejecutar
-git clone https://github.com/Esteban-Developer/proyecto_final.git
+abrir la consola de comandos y ejecutar:
+`git clone https://github.com/Esteban-Developer/proyecto_final.git`
 
-tener abierto docker
+(Asegúrate de tener Docker abierto)
 
-###  Usuarios de Windows (PowerShell / CMD)
+###  Opción 1: Usuarios de Windows (PowerShell / CMD)
 
-Si no tienes instalada la herramienta `make`, puedes levantar todo el sistema directamente con Docker Compose desde la **raíz del proyecto**:
+Levanta todo el sistema con Docker Compose descargando las imágenes de producción desde la **raíz del proyecto**:
 
 ```powershell
-docker compose -f fastapi_app/docker-compose.yml up -d --build
+docker compose -f fastapi_app/docker-compose.yml up -d
 ```
 
 Para ver los logs en vivo (vital para la sustentación):
@@ -176,14 +176,15 @@ make stop      # Detiene el sistema
 
 
 
-## CI/CD (GitHub Actions)
+## CI/CD (GitHub Actions + DockerHub)
 
-Pipeline en `.github/workflows/ci.yml`:
-- instala dependencias de `fastapi_app`
-- valida sintaxis (`compileall`)
-- construye imagen Docker de la API
+Nuestro Pipeline (`.github/workflows/ci.yml`) hace lo siguiente:
+- Instala dependencias y valida la sintaxis del código.
+- Inicia sesión en DockerHub de forma segura.
+- Construye la imagen Docker de la API y el Worker.
+- **Sube la imagen a DockerHub (`esteban889/inferno-api:v1`) automáticamente.**
 
-Se ejecuta automáticamente en push/pull request a `main`.
+Se ejecuta automáticamente en cada `push` o `pull request` a la rama `main`. Gracias a esto, cualquier persona que ejecute el proyecto bajará siempre la versión más estable y probada de la nube, sin tener que compilar el código fuente en su computadora.
 
 ---
 
