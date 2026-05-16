@@ -13,9 +13,12 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - redis
-      - rabbitmq
-      - mysql
+      redis:
+        condition: service_started
+      mysql:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
 
   worker:
     image: esteban889/inferno-api:v1
@@ -29,9 +32,12 @@ services:
       RABBITMQ_HOST: rabbitmq
       DB_HOST: mysql
     depends_on:
-      - redis
-      - rabbitmq
-      - mysql
+      redis:
+        condition: service_started
+      mysql:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
 
   redis:
     image: redis:7-alpine
@@ -48,6 +54,11 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   mysql:
     image: mysql:8.0
