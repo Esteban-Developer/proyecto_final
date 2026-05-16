@@ -114,25 +114,38 @@ Swagger: `http://127.0.0.1:8000/docs`
 
 ---
 
-##  Manual de Ejecución (¡100% Dockerizado y Distribuido!)
+## 🚀 Guía de Despliegue en Cualquier Máquina (Paso a Paso)
 
-> **¡NUEVO!** El proyecto ya no depende de XAMPP local. La base de datos MySQL se inicializa automáticamente en Docker usando el archivo `store.sql`. **Además, las imágenes del sistema se descargan automáticamente desde DockerHub gracias a nuestro pipeline de CI/CD.**
+Este proyecto está 100% dockerizado y es un sistema distribuido real. Las imágenes están alojadas en DockerHub, por lo que **no necesitas tener instalado PHP, Python, Node ni configurar bases de datos manualmente.**
 
-### Clonar repositorio
+> **Requisito previo:** Debes tener instalado y abierto **Docker Desktop**.
 
-abrir la consola de comandos y ejecutar:
-`git clone https://github.com/Esteban-Developer/proyecto_final.git`
+Sigue estos pasos exactos para probar el proyecto en una computadora nueva:
 
-(Asegúrate de tener Docker abierto)
+**Paso 1:** Abre tu Explorador de Archivos, ve a la carpeta donde quieras descargar el proyecto (por ejemplo, "Documentos" o "Escritorio"). Haz clic derecho en el fondo blanco y selecciona **"Abrir en Terminal"** (Open in Terminal).
 
-###  Opción 1: Usuarios de Windows (PowerShell / CMD)
-
-Levanta todo el sistema con Docker Compose descargando las imágenes de producción desde la **raíz del proyecto**:
-
-```powershell
-docker compose -f fastapi_app/docker-compose.yml up -d
+**Paso 2:** Descarga el código del proyecto ejecutando:
+```bash
+git clone https://github.com/Esteban-Developer/proyecto_final.git
 ```
 
+**Paso 3:** Entra a la carpeta del proyecto que acabas de descargar:
+```bash
+cd proyecto_final
+```
+
+**Paso 4:** ¡Hora de la magia! Ejecuta el siguiente comando para que Docker descargue nuestro sistema completo desde la nube (DockerHub) y encienda todos los servicios:
+```bash
+docker compose -f fastapi_app/docker-compose.yml up -d
+```
+*(Nota: La primera vez tardará uno o dos minutos mientras descarga las imágenes. Una vez termine y veas todo en verde, el sistema estará listo).*
+
+**Paso 5:** Abre tu navegador favorito y ve a:
+👉 **[http://localhost:8000/](http://localhost:8000/)** para ver la tienda funcionando.
+
+---
+
+### Comandos útiles para la sustentación:
 Para ver los logs en vivo (vital para la sustentación):
 ```powershell
 docker compose -f fastapi_app/docker-compose.yml logs -f
