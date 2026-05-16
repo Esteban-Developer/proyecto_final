@@ -1,8 +1,6 @@
 services:
   api:
-    build:
-      context: ..
-      dockerfile: fastapi_app/Dockerfile
+    image: esteban889/inferno-api:v1
     container_name: inferno_api
     working_dir: /app/fastapi_app
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000
@@ -20,9 +18,7 @@ services:
       - mysql
 
   worker:
-    build:
-      context: ..
-      dockerfile: fastapi_app/Dockerfile
+    image: esteban889/inferno-api:v1
     container_name: inferno_worker
     working_dir: /app/fastapi_app
     command: python -m app.worker
