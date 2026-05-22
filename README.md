@@ -1,4 +1,4 @@
-# Inferno Colombia — E-commerce Distribuido (Corte 3)
+# Inferno Colombia — E-commerce Distribuido (Corte 3 Final)
 
 <p align="center">
   <img src="https://capsule-render.vercel.app/api?type=waving&height=220&color=0:0f172a,50:1e293b,100:334155&text=Inferno%20Colombia%20Corte%203&fontColor=ffffff&fontSize=42&animation=fadeIn&fontAlignY=38&desc=FastAPI%20%2B%20Redis%20%2B%20RabbitMQ%20%2B%20MySQL&descAlignY=58" alt="Inferno Colombia Banner" />
