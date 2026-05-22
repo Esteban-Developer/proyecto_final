@@ -114,7 +114,7 @@ Swagger: `http://127.0.0.1:8000/docs`
 
 ---
 
-## 🚀 Guía de Despliegue en Cualquier Máquina (Paso a Paso)
+##  Guía de Despliegue en Cualquier Máquina (Paso a Paso)
 
 Este proyecto está 100% dockerizado y es un sistema distribuido real. Las imágenes están alojadas en DockerHub, por lo que **no necesitas tener instalado PHP, Python, Node ni configurar bases de datos manualmente.**
 
@@ -141,12 +141,12 @@ docker compose -f fastapi_app/docker-compose.yml up -d
 *(Nota: La primera vez tardará uno o dos minutos mientras descarga las imágenes. Una vez termine y veas todo en verde, el sistema estará listo).*
 
 **Paso 5:** Abre tu navegador favorito y ve a:
-👉 **[http://localhost:8000/](http://localhost:8000/)** para ver la tienda funcionando.
+ **[http://localhost:8000/](http://localhost:8000/)** para ver la tienda funcionando.
 
 ---
 
 ### Comandos útiles para la sustentación:
-Para ver los logs en vivo (vital para la sustentación):
+Para ver los logs en vivo 
 ```powershell
 docker compose -f fastapi_app/docker-compose.yml logs -f
 ```
