@@ -66,13 +66,17 @@
 
 {% block extra_js %}
 <script>
-  $("#logform").submit(function(event) {
+  $("#logform").submit(function (event) {
+    $("#nameerr").html("");
+    $("#conerr").html("");
+    $("#eerr").html("");
+
     var name = $('#username').val();
     var email = $('#eemail').val();
     var con = $('#con').val();
 
-    var letters = /^[A-Za-z\\s]+$/;
-    var em = /\\S+@\\S+\\.\\S+/;
+    var letters = /^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/;
+    var em = /\S+@\S+\.\S+/;
     var numbers = /^[0-9]{10,11}$/;
 
     if (!name.match(letters)) {
@@ -92,4 +96,3 @@
   });
 </script>
 {% endblock %}
-
